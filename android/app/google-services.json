@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "544973401000",
+    "project_id": "nativeotp-e5cb6",
+    "storage_bucket": "nativeotp-e5cb6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:544973401000:android:c6e59993c58b5d4d888b9d",
+        "android_client_info": {
+          "package_name": "com.otp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmlmzmejKwFVf8vc8ZZX2zIOuF52eDczc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -19,7 +19,7 @@ if (__DEV__) {
 import "./i18n"
 import "./utils/ignoreWarnings"
 import { useFonts } from "expo-font"
-import React from "react"
+import React, { useEffect } from "react"
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context"
 import * as Linking from "expo-linking"
 import { useInitialRootStore } from "./models"
@@ -30,6 +30,8 @@ import { customFontsToLoad } from "./theme"
 import Config from "./config"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { ViewStyle } from "react-native"
+import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth"
+import { useStores } from "app/models"
 
 export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE"
 
@@ -71,7 +73,18 @@ function App(props: AppProps) {
     isRestored: isNavigationStateRestored,
   } = useNavigationPersistence(storage, NAVIGATION_PERSISTENCE_KEY)
 
+  const { userID } = useStores()
+
   const [areFontsLoaded, fontLoadError] = useFonts(customFontsToLoad)
+
+  const userAuthState = (user: FirebaseAuthTypes.User | null) => {
+    userID.setUser(user)
+  }
+
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(userAuthState)
+    return () => subscriber()
+  }, [])
 
   const { rehydrated } = useInitialRootStore(() => {
     // This runs after the root store has been initialized and rehydrated.
