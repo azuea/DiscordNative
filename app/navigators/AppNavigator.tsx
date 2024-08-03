@@ -35,7 +35,9 @@ export type AppStackParamList = {
   // 🔥 Your screens go here
   Login: undefined
   Register: undefined
-  // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
+  Validation: undefined
+  Home: undefined
+	// IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
 
 /**
@@ -53,19 +55,27 @@ export type AppStackScreenProps<T extends keyof AppStackParamList> = NativeStack
 const Stack = createNativeStackNavigator<AppStackParamList>()
 
 const AppStack = observer(function AppStack() {
-  const { userID } = useStores()
+  const { authModel } = useStores()
+  
   return (
     <Stack.Navigator screenOptions={{ headerShown: false, navigationBarColor: colors.background }}>
-      {userID.uid ? (
+      {authModel.user?.uid ? (
         <>
-          <Stack.Screen name="Welcome" component={Screens.WelcomeScreen} />
+          {authModel.user.emailVerified ? (
+            <Stack.Screen name="Welcome" component={Screens.WelcomeScreen} />
+          ) : (
+            <Stack.Screen name="Validation" component={Screens.ValidationScreen} />
+          )}
+
           {/* 🔥 Your authenticated screens go here */}
         </>
       ) : (
         <>
           <Stack.Screen name="Login" component={Screens.LoginScreen} />
           <Stack.Screen name="Register" component={Screens.RegisterScreen} />
-          {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
+
+          <Stack.Screen name="Home" component={Screens.HomeScreen} />
+			{/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
         </>
       )}
     </Stack.Navigator>

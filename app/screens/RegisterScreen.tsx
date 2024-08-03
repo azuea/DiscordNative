@@ -1,11 +1,14 @@
 import React, { FC, useState } from "react"
 import { observer } from "mobx-react-lite"
-import { Alert, ViewStyle, TextStyle } from "react-native"
+import { ViewStyle, TextStyle } from "react-native"
 import { AppStackScreenProps, AppStackParamList } from "app/navigators"
 import { Screen, Text, TextField, Button } from "app/components"
 import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
+import { colors } from "app/theme"
+import validateEmail from "app/utils/validateEmail"
+import validatePassword from "app/utils/validatePassword"
 
 type RegisterScreenNavigationProp = NativeStackNavigationProp<AppStackParamList, "Register">
 
@@ -14,22 +17,49 @@ interface RegisterScreenProps extends AppStackScreenProps<"Register"> {}
 export const RegisterScreen: FC<RegisterScreenProps> = observer(function RegisterScreen() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [verificationSent, setVerificationSent] = useState(false)
+  const [validationError, setValidationError] = useState({ email: "", password: "" })
+  const [submissionError, setSubmissionError] = useState("")
   const navigation = useNavigation<RegisterScreenNavigationProp>()
 
-  const handleRegister = async () => {
-    try {
-      const userCredential = await auth().createUserWithEmailAndPassword(email, password)
-      const user = userCredential.user
+  function emailHandler(email: string) {
+    setEmail(email)
+    if (validateEmail(email) === true || email === "") {
+      setValidationError((prev) => ({ ...prev, email: "" }))
+    } else {
+      setValidationError((prev) => ({ ...prev, email: "Invalid email address" }))
+    }
+  }
 
-      await user.sendEmailVerification()
-      await auth().signOut()
-      setVerificationSent(true)
-      Alert.alert("Verification Email Sent", "Please check your email for the verification link.")
-    } catch (error) {
-      const firebaseError = error as FirebaseAuthTypes.NativeFirebaseAuthError
-      console.error(firebaseError)
-      Alert.alert("Registration Error", firebaseError.message)
+  function passwordHandler(password: string) {
+    setPassword(password)
+    if (validatePassword(password) === true || password === "") {
+      setValidationError((prev) => ({ ...prev, password: "" }))
+    } else {
+      setValidationError((prev) => ({ ...prev, password: "Invalid password" }))
+    }
+  }
+
+  const handleRegister = async () => {
+    if (validateEmail(email) && validatePassword(password)) {
+      try {
+        const userCredential = await auth().createUserWithEmailAndPassword(email, password)
+        const user = userCredential.user
+
+        console.log(user.uid + " register " + user.emailVerified)
+
+
+        await user.sendEmailVerification()
+        navigation.navigate("Validation")
+      } catch (error) {
+        const firebaseError = error as FirebaseAuthTypes.NativeFirebaseAuthError
+        console.error("Error registering:", firebaseError.message)
+        setSubmissionError("An account with that email already exists!")
+      }
+    } else {
+      setValidationError({
+        email: validateEmail(email) ? "" : "Invalid email address",
+        password: validatePassword(password) ? "" : "Invalid password",
+      })
     }
   }
 
@@ -40,26 +70,41 @@ export const RegisterScreen: FC<RegisterScreenProps> = observer(function Registe
       <TextField
         placeholder="Email"
         value={email}
-        onChangeText={setEmail}
+        onChangeText={emailHandler}
         autoCapitalize="none"
         keyboardType="email-address"
         containerStyle={$textField}
       />
+      {validationError.email ? (
+        <Text size="xxs" style={$errorStyle}>
+          {validationError.email}
+        </Text>
+      ) : null}
+
       <TextField
         placeholder="Password"
         value={password}
-        onChangeText={setPassword}
+        onChangeText={passwordHandler}
         secureTextEntry
         containerStyle={$textField}
       />
+      {validationError.password ? (
+        <Text size="xxs" style={$errorStyle}>
+          {validationError.password}
+        </Text>
+      ) : null}
+
+      {submissionError ? (
+        <Text size="xxs" style={$errorStyle}>
+          {submissionError}
+        </Text>
+      ) : null}
+
       <Text size="xxs" style={$linkText} onPress={() => navigation.navigate("Login")}>
-        New here? Make an account
+        Already have an account? Log in
       </Text>
 
       <Button text="Register" style={$button} textStyle={$buttonText} onPress={handleRegister} />
-      {verificationSent && (
-        <Text text="A verification email has been sent to your email address. Please verify your email before logging in." />
-      )}
     </Screen>
   )
 })
@@ -81,8 +126,14 @@ const $header: TextStyle = {
   paddingVertical: 10,
 }
 
+const $errorStyle: TextStyle = {
+  color: colors.palette.angry500,
+  padding: 0,
+  marginBottom: 5,
+}
+
 const $textField: ViewStyle = {
-  marginBottom: 16,
+  marginBottom: 9,
   backgroundColor: "#FFF",
   borderColor: "gray",
 }
@@ -91,7 +142,7 @@ const $linkText: TextStyle = {
   fontSize: 14,
   color: "#1e90ff",
   textAlign: "center",
-  marginTop: 16,
+  marginBottom: 5,
 }
 
 const $button: ViewStyle = {
@@ -99,7 +150,6 @@ const $button: ViewStyle = {
   paddingVertical: 12,
   borderRadius: 8,
   alignItems: "center",
-  // marginTop: 24,
 }
 
 const $buttonText: TextStyle = {

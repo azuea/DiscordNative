@@ -5,9 +5,12 @@ import { AppStackScreenProps, AppStackParamList } from "app/navigators"
 import { Screen, Text } from "app/components"
 import { TextField, Button } from "../components"
 import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth"
-
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
+import validateEmail from "app/utils/validateEmail"
+import validatePassword from "app/utils/validatePassword"
+import { colors } from "app/theme"
+import { useStores } from "app/models"
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<AppStackParamList, "Login">
 
@@ -16,33 +19,52 @@ interface LoginScreenProps extends AppStackScreenProps<"Login"> {}
 export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [validationError, setValidationError] = useState({ email: "", password: "" })
+  const [submissionError, setSubmissionError] = useState("")
   const navigation = useNavigation<LoginScreenNavigationProp>()
+  const { authModel } = useStores()
 
   function emailHandler(email: string) {
     setEmail(email)
+    if (validateEmail(email) === true || email === "") {
+      setValidationError((prev) => ({ ...prev, email: "" }))
+    } else {
+      setValidationError((prev) => ({ ...prev, email: "Invalid email address" }))
+    }
   }
 
   function passwordHandler(password: string) {
     setPassword(password)
+    if (validatePassword(password) === true || password === "") {
+      setValidationError((prev) => ({ ...prev, password: "" }))
+    } else {
+      setValidationError((prev) => ({ ...prev, password: "Invalid password" }))
+    }
   }
 
   const handleSignUp = async () => {
-    try {
-      const userInfo = await auth().signInWithEmailAndPassword(email, password)
-      const user = userInfo.user
+    if (validateEmail(email) && validatePassword(password)) {
+      try {
+        const userInfo = await auth().signInWithEmailAndPassword(email, password)
+        const user = userInfo.user
+        console.log(user.uid + " login " + user.emailVerified)
+       
 
-      if (user.emailVerified) {
-        console.log("Email verified")
-        Alert.alert("Login Success", "Welcome to the app!")
-      } else {
-        Alert.alert("Email Not Verified", "Please verify your email before logging in.")
-        auth().signOut()
+        if (user.emailVerified) {
+          authModel.setVerified(true)
+          console.log("Email verified")
+        } else {
+          navigation.navigate("Validation")
+        }
+
+        console.log("User signed up")
+      } catch (error) {
+        const firebaseError = error as FirebaseAuthTypes.NativeFirebaseAuthError
+        console.error("Error signing up:", firebaseError.message)
+        setSubmissionError("Wrong email or password")
       }
-
-      console.log("User signed up")
-    } catch (error) {
-      const firebaseError = error as FirebaseAuthTypes.NativeFirebaseAuthError
-      console.error("Error signing up:", firebaseError.message)
+    } else {
+      Alert.alert("Invalid Input", "Please correct the errors before submitting.")
     }
   }
 
@@ -52,16 +74,34 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen()
       <TextField
         placeholder="Email"
         value={email}
-        onChangeText={(value) => emailHandler(value)}
+        onChangeText={emailHandler}
         containerStyle={$textField}
       />
+      {validationError.email ? (
+        <Text size="xxs" style={$errorStyle}>
+          {validationError.email}
+        </Text>
+      ) : null}
+
       <TextField
         placeholder="Password"
         value={password}
-        onChangeText={(value) => passwordHandler(value)}
+        onChangeText={passwordHandler}
         containerStyle={$textField}
         secureTextEntry
       />
+      {validationError.password ? (
+        <Text size="xxs" style={$errorStyle}>
+          {validationError.password}
+        </Text>
+      ) : null}
+
+      {submissionError ? (
+        <Text size="xxs" style={$errorStyle}>
+          {submissionError}
+        </Text>
+      ) : null}
+
       <Text style={$linkText} onPress={() => navigation.navigate("Register")}>
         New here? Make an account
       </Text>
@@ -87,8 +127,14 @@ const $header: TextStyle = {
   paddingVertical: 10,
 }
 
+const $errorStyle: TextStyle = {
+  color: colors.palette.angry500,
+  padding: 0,
+  marginBottom: 5,
+}
+
 const $textField: ViewStyle = {
-  marginBottom: 16,
+  marginBottom: 9,
   backgroundColor: "#FFF",
   borderColor: "gray",
 }
@@ -97,7 +143,6 @@ const $linkText: TextStyle = {
   fontSize: 14,
   color: "#1e90ff",
   textAlign: "center",
-  marginTop: 16,
 }
 
 const $button: ViewStyle = {
@@ -105,7 +150,6 @@ const $button: ViewStyle = {
   paddingVertical: 12,
   borderRadius: 8,
   alignItems: "center",
-  // marginTop: 24,
 }
 
 const $buttonText: TextStyle = {

@@ -73,17 +73,13 @@ function App(props: AppProps) {
     isRestored: isNavigationStateRestored,
   } = useNavigationPersistence(storage, NAVIGATION_PERSISTENCE_KEY)
 
-  const { userID } = useStores()
+  const { authModel } = useStores()
 
   const [areFontsLoaded, fontLoadError] = useFonts(customFontsToLoad)
 
-  const userAuthState = (user: FirebaseAuthTypes.User | null) => {
-    userID.setUser(user)
-  }
-
   useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(userAuthState)
-    return () => subscriber()
+    const subscriber = authModel.startAuthListener()
+    return subscriber
   }, [])
 
   const { rehydrated } = useInitialRootStore(() => {
