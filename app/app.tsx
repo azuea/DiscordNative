@@ -30,7 +30,7 @@ import { customFontsToLoad } from "./theme"
 import Config from "./config"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { ViewStyle } from "react-native"
-import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth"
+// import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth"
 import { useStores } from "app/models"
 
 export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE"
