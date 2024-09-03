@@ -1,4 +1,4 @@
-import { types, Instance, SnapshotIn, SnapshotOut } from "mobx-state-tree"
+import { types, SnapshotIn, SnapshotOut } from "mobx-state-tree"
 import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth"
 import { withSetPropAction } from "./helpers/withSetPropAction"
 import { UserModel } from "./User"
@@ -45,7 +45,7 @@ export const AuthStore = types
     },
   }))
 
-export interface AuthStore extends Instance<typeof AuthStore> {}
+
 export interface AuthStoreSnapshotOut extends SnapshotOut<typeof AuthStore> {}
 export interface AuthStoreSnapshotIn extends SnapshotIn<typeof AuthStore> {}
 
@@ -53,5 +53,5 @@ export interface AuthStoreSnapshotIn extends SnapshotIn<typeof AuthStore> {}
 /*
  * The Firebase onAuthStateChanged listener typically triggers when there are
  * significant changes to the user's authentication state, such as signing in,
- * signing out, or changing the user's profile.
+ * signing out, or changing the user's profile, email verified is not one of them.
  */

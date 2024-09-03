@@ -47,7 +47,6 @@ export const RegisterScreen: FC<RegisterScreenProps> = observer(function Registe
 
         console.log(user.uid + " register " + user.emailVerified)
 
-
         await user.sendEmailVerification()
         navigation.navigate("Validation")
       } catch (error) {

@@ -1,21 +1,21 @@
 import React, { FC, useEffect } from "react"
 import { observer } from "mobx-react-lite"
 import { ViewStyle, TextStyle } from "react-native"
-import { AppStackParamList, AppStackScreenProps } from "app/navigators"
+import { AppStackScreenProps } from "app/navigators"
 import { Screen, Text, Button } from "app/components"
 
 import { useStores } from "app/models"
-import { useNavigation } from "@react-navigation/native"
-import { NativeStackNavigationProp } from "@react-navigation/native-stack"
+// import { useNavigation } from "@react-navigation/native"
+// import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import auth from "@react-native-firebase/auth"
 
 interface ValidationScreenProps extends AppStackScreenProps<"Validation"> {}
 
-type ValidationScreenNavigationProp = NativeStackNavigationProp<AppStackParamList, "Validation">
+// type ValidationScreenNavigationProp = NativeStackNavigationProp<AppStackParamList, "Validation">
 
 export const ValidationScreen: FC<ValidationScreenProps> = observer(function ValidationScreen() {
-  const navigation = useNavigation<ValidationScreenNavigationProp>()
-  
+  // const navigation = useNavigation<ValidationScreenNavigationProp>()
+
   const { authModel } = useStores()
 
   useEffect(() => {
@@ -26,12 +26,6 @@ export const ValidationScreen: FC<ValidationScreenProps> = observer(function Val
 
     return () => clearInterval(interval)
   }, [])
-
-
-
-  useEffect(() => {
-    if (authModel.user?.emailVerified === true) navigation.navigate("Welcome")
-  }, [authModel.user])
 
   return (
     <Screen style={$root} preset="fixed">

@@ -1,5 +1,6 @@
 // TODO: write documentation for colors and palette in own markdown file and add links from here
 
+
 const palette = {
   neutral100: "#FFFFFF",
   neutral200: "#F4F2F1",
@@ -35,6 +36,13 @@ const palette = {
 
   overlay20: "rgba(25, 16, 21, 0.2)",
   overlay50: "rgba(25, 16, 21, 0.5)",
+  serverbg: "#1C1D22",
+  basic: "#2D2D35",
+  // placeholder: "#6F707D",
+  button: "#5C73F2",
+  darkest: "#141318",
+  borderTab: "#3F3F48",
+  discordGrey: "#787B82",
 } as const
 
 export const colors = {
@@ -44,6 +52,13 @@ export const colors = {
    * semantic names as much as possible.
    */
   palette,
+  serverbg: palette.serverbg,
+  basic: palette.basic,
+  // placeholder: palette.placeholder,
+  button: palette.button,
+  darkest: palette.darkest,
+  borderTab: palette.borderTab,
+  discordGrey: palette.discordGrey,
   /**
    * A helper for making something see-thru.
    */

@@ -48,7 +48,6 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen()
         const userInfo = await auth().signInWithEmailAndPassword(email, password)
         const user = userInfo.user
         console.log(user.uid + " login " + user.emailVerified)
-       
 
         if (user.emailVerified) {
           authModel.setVerified(true)
