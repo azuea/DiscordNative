@@ -9,6 +9,7 @@ import serverCreate from "app/services/api/serverCreate"
 import { useNavigation } from "@react-navigation/native"
 import { HomeTabParamList } from "app/navigators/HomeTab"
 import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
 type ServerCreationScreenNavigationProps = BottomTabNavigationProp<HomeTabParamList, "Home">
 
@@ -18,7 +19,6 @@ export const ServerCreationScreen: FC<ServerCreationScreenProps> = observer(
   function ServerCreationScreen() {
     const [serverName, setServerName] = useState("")
     const [buttonState, setButtonState] = useState(false)
-
     const { authModel } = useStores()
     const navigation = useNavigation<ServerCreationScreenNavigationProps>()
 
@@ -43,11 +43,13 @@ export const ServerCreationScreen: FC<ServerCreationScreenProps> = observer(
               let serverID = ""
               try {
                 setButtonState(true)
-                // console.log(authModel.user?.uid)
+
                 if (typeof authModel.user?.uid === "string") {
                   serverID = await serverCreate(serverName, authModel.user?.uid)
+                  AsyncStorage.setItem('lastServerID', serverID)
+                
                 } else {
-                  console.error("User ID is not available.")
+                  console.error("Failed to create server, UserID is not available.")
                 }
               } catch (error) {
                 console.error("Failed to create server: ", error)

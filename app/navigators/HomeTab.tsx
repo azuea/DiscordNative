@@ -1,10 +1,7 @@
 import React from "react"
-import {
-  BottomTabScreenProps,
-  createBottomTabNavigator,
-} from "@react-navigation/bottom-tabs"
+import { BottomTabScreenProps, createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { HomeScreen, NotificationsScreen, UserProfileScreen } from "app/screens"
-import { CompositeScreenProps} from "@react-navigation/native"
+import { CompositeScreenProps } from "@react-navigation/native"
 import { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
 import { colors, spacing, typography } from "../theme"
 import { useSafeAreaInsets } from "react-native-safe-area-context"

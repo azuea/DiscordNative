@@ -32,5 +32,8 @@ export function listenToServers(
     },
   )
 
-  return unsubscribe
+  return () => {
+    console.log("Listener removed for servers")
+    return unsubscribe()
+  }
 }

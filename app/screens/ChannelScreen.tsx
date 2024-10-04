@@ -12,6 +12,7 @@ type ChannelScreenRouteProp = RouteProp<AppStackParamList, "Channel">
 
 interface ChannelScreenProps extends AppStackScreenProps<"Channel"> {}
 
+
 export const ChannelScreen: FC<ChannelScreenProps> = observer(function ChannelScreen() {
   const [message, setMessage] = useState("")
   const { authModel } = useStores()

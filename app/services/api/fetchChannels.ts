@@ -1,17 +1,12 @@
 import firestore from "@react-native-firebase/firestore"
 import { channelType } from "app/screens"
 
- 
-
 export function listenToChannels(
   serverID: string,
   setChannelData: React.Dispatch<React.SetStateAction<channelType[]>>,
-  setLocalID: React.Dispatch<React.SetStateAction<string>>,
+  // setLocalID: React.Dispatch<React.SetStateAction<string>>,
 ) {
-  // console.log("listen to channels at server: ", serverID)
   const channelRef = firestore().collection("server").doc(serverID).collection("channels")
-  console.log("Listener added for serverID:", serverID)
-
   const unsubscribe = channelRef.onSnapshot(
     (snapshot) => {
       snapshot.docChanges().forEach((change) => {
@@ -34,10 +29,10 @@ export function listenToChannels(
       console.error("Error listening to channel changes: ", error)
     },
   )
-  setLocalID("")
+  // setLocalID("")
 
   return () => {
-    console.log("Listener removed for serverID:", serverID)
+    console.log("Listener removed for channel of serverID:", serverID)
     return unsubscribe()
   }
 }
